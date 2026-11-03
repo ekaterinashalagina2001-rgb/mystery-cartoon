@@ -1,0 +1,39 @@
+name: Render mystery cartoon
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Unpack project
+        run: |
+          mkdir project
+          unzip -q *.zip -d project
+          cd project
+          npm install
+
+      - name: Render MP4
+        run: |
+          cd project
+          npx remotion render src/index.ts MysteryShort mystery-short.mp4
+
+      - name: Upload finished video
+        uses: actions/upload-artifact@v4
+        with:
+          name: mystery-cartoon-video
+          path: project/mystery-short.mp4
+          retention-days: 7
